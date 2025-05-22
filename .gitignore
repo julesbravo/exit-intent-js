@@ -1,0 +1,43 @@
+# Node modules
+node_modules/
+
+# Cypress output
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/
+build/
+
+# Env files
+.env
+.env.*
+
+# Misc
+coverage/
+*.local
+
+# VSCode
+.vscode/
+
+# Mac system files
+.AppleDouble
+.LSOverride
+
+# IDEs
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Cypress tests (do not publish to npm)
+cypress/ 

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Exit Intent Test</title>
+  <script src="/src/exit-intent.js"></script>
+  <script type="text/javascript">
+    // Ensure we only initialize the exit intent once
+    if (typeof window.exitIntentInitialized === "undefined") {
+      window.exitIntentInitialized = false;
+    }
+
+    // Only initialize the exit intent if it hasn't been initialized yet
+    if (!window.exitIntentInitialized) {
+      // Initialize the exit intent
+      observeExitIntent({
+        rapidMouseUpward: -1000, 
+        mouseLeaveDelay: 500,
+        timeOnPage: 0,
+        idleTime: 0,
+        tabChange: false,
+        debug: true
+      });
+
+      // Add an event listener for the exit intent
+      window.addEventListener("exit-intent", (detail) => {
+          function openPopup() {
+              // Check if Postscript is ready and if the popup can be opened
+              if (window.postscript &&
+                  typeof window.postscript.popups?.find === "function" &&
+                  typeof window.postscript.popups?.open === "function") {
+                  // Find the popup and open it
+                  window.postscript.popups.find().then((popupId) => {
+                      if (popupId) {
+                          window.postscript.popups.open(popupId);
+                      }
+                  });
+              } else {
+                  // Wait for Postscript SDK to be ready, then try again
+                  window.addEventListener("postscriptReady", openPopup, { once: true });
+              }
+          }
+          openPopup();
+      }, { once: true });
+      window.exitIntentInitialized = true;
+    }
+  </script>
+</head>
+<body style="height: 10000px;">
+  <h1>Exit Intent Test Page</h1>
+</body>
+</html> 
