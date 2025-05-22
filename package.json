@@ -1,7 +1,7 @@
 {
-  "name": "exit-intent",
+  "name": "exit-intent-js",
   "version": "1.0.0",
-  "description": "Lightweight, dependency-free JavaScript utility for detecting exit-intent. Fires a single custom event when the user looks like they’re about to leave – based on time-on-page, idle time, mouse-leave, tab visibility & window blur. Perfect for pop-ups, surveys or last-chance offers.",
+  "description": "Lightweight, dependency-free JavaScript utility for detecting exit-intent. Fires a single custom event when the user looks like they're about to leave – based on time-on-page, idle time, mouse-leave, tab visibility & window blur. Perfect for pop-ups, surveys or last-chance offers.",
   "main": "src/exit-intent.js",
   "scripts": {
     "test": "cypress run",
@@ -13,5 +13,19 @@
   "license": "MIT",
   "devDependencies": {
     "cypress": "^14.3.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/julesbravo/exit-intent-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/julesbravo/exit-intent-js/issues"
+  },
+  "homepage": "https://github.com/julesbravo/exit-intent-js#readme",
+  "files": [
+    "src",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ]
 }

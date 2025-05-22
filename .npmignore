@@ -1,0 +1,14 @@
+# Ignore everything that is not needed in the npm package
+# Test & tooling
+cypress/
+.github/
+.vscode/
+.idea/
+
+# Config & misc
+.DS_Store
+.nyc_output/
+coverage/
+
+# Source maps / build artefacts that aren't required
+*.log 
