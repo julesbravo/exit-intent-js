@@ -10,6 +10,7 @@ A lightweight, vanilla JavaScript library for detecting exit intent on web pages
   - Mouse leaves window
   - Tab/document visibility change
   - Window loses focus (blur)
+  - Pages Viewed
 - Customizable options
 - Simple API
 - No dependencies
@@ -19,7 +20,7 @@ A lightweight, vanilla JavaScript library for detecting exit intent on web pages
 Copy `src/exit-intent.js` into your project, or install via npm (if published):
 
 ```sh
-npm install exit-intent
+npm install exit-intent-js
 ```
 
 ## Usage
@@ -52,6 +53,14 @@ window.addEventListener('my-exit-event', e => {
 | `windowBlur`      | boolean  | `true`       | Trigger when window loses focus (user switches tabs/apps or minimizes).      |
 | `eventName`       | string   | `'exit-intent'` | Name of the custom event dispatched on window.                          |
 | `debug`           | boolean  | `false`      | Enable debug logging to console.                                            |
+| `pageViewsToTrigger` | number | `0` | Fire the exit-intent event immediately once the stored page-view counter reaches this threshold. `0` disables the feature. |
+
+By default the library stores a persistent page-view counter in `localStorage` under the key `exit-intent-page-views` and automatically increments that value every time the script is evaluated (i.e. on a full page load).  
+If you have a single-page-app (SPA) and want to increment the counter on client-side route changes, call:
+
+```js
+observeExitIntent.incrementPageViews(); // bump by 1 (or pass a custom amount)
+```
 
 ## Exit Intent Reasons
 
@@ -62,7 +71,9 @@ The custom event's `detail` property will be one of:
 - `'tabChange'`     — Tab/document became hidden
 - `'windowBlur'`    — Window lost focus
 
-## Example
+## Examples
+
+### 1. Basic usage (vanilla JS)
 
 ```js
 observeExitIntent({
@@ -79,6 +90,11 @@ window.addEventListener('exit-intent', e => {
   alert('Exit intent detected! Reason: ' + e.detail);
 });
 ```
+
+### 2. Triggering a Postscript Popup on exit-intent
+
+If you use [Postscript](https://postscript.io/) for SMS pop-ups, you can open a popup only when exit intent is detected. A full working page lives in [`examples/postscript.html`](examples/postscript.html). 
+---
 
 ## Cleanup
 

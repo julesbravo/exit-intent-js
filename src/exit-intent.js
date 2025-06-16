@@ -1,29 +1,42 @@
 // Vanilla JS Exit Intent Detection Library
-// Usage: observeExitIntent(options)
-//
-// Options:
-//   timeOnPage: number (ms, default: 15000)
-//     Time spent on the page before triggering exit intent. Set to 0 to disable.
-//
-//   idleTime: number (ms, default: 5000)
-//     Time spent idle (no user interaction) before triggering exit intent. Set to 0 to disable.
-//     Uses IdleDetector if available, otherwise falls back to manual detection.
-//
-//   mouseLeaveDelay: number (ms, default: 1000)
-//     Delay after mouse leaves the window before triggering exit intent. Set to 0 to disable.
-//
-//   tabChange: boolean (default: true)
-//     Whether to trigger exit intent when the user changes tabs (document becomes hidden).
-//
-//   windowBlur: boolean (default: true)
-//     Whether to trigger exit intent when the window loses focus (user switches tabs/apps or minimizes).
-//
-//   eventName: string (default: 'exit-intent')
-//     The name of the custom event dispatched on window when exit intent is detected.
-//
-// Example:
-//   observeExitIntent({ eventName: 'my-exit-event', timeOnPage: 10000 });
-//   window.addEventListener('my-exit-event', e => console.log('Exit intent:', e.detail));
+
+// Helper: page-view counter using localStorage so we can optionally delay
+// exit-intent detection until the visitor has landed on the site a certain
+// number of times.
+const PAGE_VIEW_STORAGE_KEY = 'exit-intent-page-views';
+
+function getPageViews(key = PAGE_VIEW_STORAGE_KEY) {
+  try {
+    const raw = localStorage.getItem(key);
+    const n = parseInt(raw, 10);
+    return isNaN(n) ? 0 : n;
+  } catch (e) {
+    // localStorage may be disabled or unavailable (SSR, privacy mode, etc.)
+    return 0;
+  }
+}
+
+function setPageViews(count, key = PAGE_VIEW_STORAGE_KEY) {
+  try {
+    localStorage.setItem(key, String(count));
+  } catch (_) {
+    /* no-op */
+  }
+}
+
+/**
+ * Increment the persisted page-view counter.
+ * @param {number} amount – how much to increment by (default 1)
+ * @param {string} key – override storage key if you need to isolate counters.
+ * @returns {number} The new total after incrementing.
+ */
+function incrementPageViews(amount = 1, key = PAGE_VIEW_STORAGE_KEY) {
+  const updated = getPageViews(key) + amount;
+  setPageViews(updated, key);
+  return updated;
+}
+
+incrementPageViews();
 
 
 function observeExitIntent(options = {}) {
@@ -36,11 +49,13 @@ function observeExitIntent(options = {}) {
     windowBlur: true, // true/false
     eventName: 'exit-intent', // event name for the custom event
     debug: false, // true/false
+    pageViewsToTrigger: 5, // Fire immediately when this many page views is reached
     ...options
   };
 
-  // Internal state
-  let triggered = false; // Whether exit intent has already been triggered
+
+  
+
   let timers = []; // Store all timeouts for cleanup
   let listeners = []; // Store all event listeners for cleanup
   let idleTimeout = null; // For manual idle detection
@@ -55,7 +70,6 @@ function observeExitIntent(options = {}) {
   // Helper to clean up all listeners and timers
   function destroy() {
     log("destroy");
-    triggered = true;
     timers.forEach(clearTimeout); // Clear all timeouts
     timers = [];
     listeners.forEach(({el, type, fn}) => el.removeEventListener(type, fn)); // Remove all event listeners
@@ -66,13 +80,23 @@ function observeExitIntent(options = {}) {
 
   // Call this to trigger exit intent and cleanup
   function trigger(reason) {
-    if (!triggered) {
-      destroy();
-      // Dispatch a custom event on window
-      log("triggered with reason: " + reason);
-      const event = new CustomEvent(config.eventName, { detail: reason });
-      window.dispatchEvent(event);
+    // Dispatch a custom event on window (do NOT destroy – we now allow multiple fires)
+    log("triggered with reason: " + reason);
+    const event = new CustomEvent(config.eventName, { detail: reason });
+    window.dispatchEvent(event);
+  }
+
+  // If the visitor has now reached the required number of page views, fire
+  // the event immediately and skip the other detectors.
+  const currentViews = getPageViews();
+  if (config.pageViewsToTrigger && currentViews >= config.pageViewsToTrigger) {
+    if (config.debug) {
+      console.log(`exit-intent: pageViewsToTrigger reached (${currentViews}). Firing immediately.`);
     }
+    trigger('pageViews');
+
+    // Continue setting up the other detectors – removing the early return allows
+    // multiple reasons to be caught even after the immediate page-view trigger.
   }
 
   // 1. Time on page: trigger after a set time
@@ -138,6 +162,9 @@ function observeExitIntent(options = {}) {
   // Return destroy for manual cleanup if needed
   return { destroy };
 }
+
+// Attach helper so consumers can manually bump the counter in SPAs.
+observeExitIntent.incrementPageViews = incrementPageViews;
 
 // Export for module usage (CommonJS)
 if (typeof module !== 'undefined' && module.exports) {
