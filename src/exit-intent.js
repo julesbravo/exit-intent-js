@@ -153,7 +153,23 @@ function observeExitIntent(options = {}) {
   // 5. Window blur: trigger when window loses focus
   if (config.windowBlur) {
     function onBlur() {
-      trigger('windowBlur');
+      // Check if focus moved to a child iframe - if so, don't trigger exit intent
+      // Use setTimeout to allow the browser to update document.activeElement
+      setTimeout(() => {
+        const activeElement = document.activeElement;
+        
+        // If the active element is an iframe and it's a child of this document,
+        // then the user is still on the page and we shouldn't trigger exit intent
+        if (activeElement && activeElement.tagName === 'IFRAME') {
+          // Check if this iframe is a child of the current document
+          if (document.contains(activeElement)) {
+            log('Window blur ignored - focus moved to child iframe');
+            return;
+          }
+        }
+        
+        trigger('windowBlur');
+      }, 0);
     }
     window.addEventListener('blur', onBlur);
     listeners.push({el: window, type: 'blur', fn: onBlur});

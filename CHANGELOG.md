@@ -18,3 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `pageViewsToTrigger` option to fire exit-intent immediately once the visitor has viewed the site a configurable number of times.
 - `observeExitIntent.incrementPageViews()` helper for SPAs to manually bump the counter on client-side route changes.
 - Cypress test coverage and documentation examples for the new feature. 
+
+
+## [1.1.1] - 2025-06-16
+### Fixed
+- Fixed issue where iframe focus would incorrectly trigger window blur exit intent detection. Now properly distinguishes between legitimate window blur events (user switching tabs/apps) and iframe focus events within the same page.
