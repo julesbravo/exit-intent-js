@@ -39,5 +39,4 @@ coverage/
 *.sublime-workspace
 *.sublime-project
 
-# Cypress tests (do not publish to npm)
-cypress/ 
+# Cypress tests (excluded from npm via package.json "files" field) 
