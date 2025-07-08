@@ -11,6 +11,7 @@ A lightweight, vanilla JavaScript library for detecting exit intent on web pages
   - Tab/document visibility change
   - Window loses focus (blur)
   - Pages Viewed
+  - Fast upward scrolling
 - Customizable options
 - Simple API
 - No dependencies
@@ -54,6 +55,9 @@ window.addEventListener('my-exit-event', e => {
 | `eventName`       | string   | `'exit-intent'` | Name of the custom event dispatched on window.                          |
 | `debug`           | boolean  | `false`      | Enable debug logging to console.                                            |
 | `pageViewsToTrigger` | number | `0` | Fire the exit-intent event immediately once the stored page-view counter reaches this threshold. `0` disables the feature. |
+| `scrollUpThreshold` | number\|object | `{mobile: 200, desktop: 400}` | Minimum pixels scrolled up to trigger exit intent. Can be a number (legacy) or object with `mobile` and `desktop` properties for responsive thresholds. |
+| `mobileBreakpoint` | number | `768` | Screen width threshold (px) for mobile detection. Used with responsive `scrollUpThreshold`. |
+| `scrollUpInterval` | number | `100` | Interval (ms) to check scroll position for upward movement. |
 
 By default the library stores a persistent page-view counter in `localStorage` under the key `exit-intent-page-views` and automatically increments that value every time the script is evaluated (i.e. on a full page load).  
 If you have a single-page-app (SPA) and want to increment the counter on client-side route changes, call:
@@ -61,6 +65,34 @@ If you have a single-page-app (SPA) and want to increment the counter on client-
 ```js
 observeExitIntent.incrementPageViews(); // bump by 1 (or pass a custom amount)
 ```
+
+## Responsive Scroll Thresholds
+
+The `scrollUpThreshold` option supports responsive thresholds for different device types:
+
+### Object Format (Recommended)
+```js
+observeExitIntent({
+  scrollUpThreshold: {
+    mobile: 200,   // Lower threshold for mobile devices (≤ 768px)
+    desktop: 400   // Higher threshold for desktop devices (> 768px)
+  },
+  mobileBreakpoint: 768 // Screen width threshold for mobile detection
+});
+```
+
+### Legacy Number Format (Still Supported)
+```js
+observeExitIntent({
+  scrollUpThreshold: 300 // Same threshold for all devices
+});
+```
+
+### Benefits of Responsive Thresholds
+- **Mobile devices**: Lower threshold (200px) makes it easier to trigger on touch devices where scrolling patterns differ
+- **Desktop devices**: Higher threshold (400px) reduces false positives from mouse wheel scrolling
+- **Automatic detection**: The library automatically detects device type based on screen width
+- **Backward compatibility**: Existing code using number values continues to work
 
 ## Exit Intent Reasons
 
@@ -70,6 +102,7 @@ The custom event's `detail` property will be one of:
 - `'mouseLeave'`    — Mouse left window
 - `'tabChange'`     — Tab/document became hidden
 - `'windowBlur'`    — Window lost focus
+- `'scrollUp'`      — User scrolled up quickly
 
 ## Examples
 
@@ -82,6 +115,12 @@ observeExitIntent({
   mouseLeaveDelay: 500,
   tabChange: true,
   windowBlur: true,
+  scrollUpThreshold: {
+    mobile: 200,   // 200px threshold for mobile devices
+    desktop: 400   // 400px threshold for desktop devices
+  },
+  mobileBreakpoint: 768,
+  scrollUpInterval: 50,
   eventName: 'exit-intent',
   debug: true
 });

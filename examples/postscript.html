@@ -13,7 +13,9 @@
     // Only initialize the exit intent if it hasn't been initialized yet
     if (!window.exitIntentInitialized) {
       // Initialize the exit intent
-      observeExitIntent({});
+      observeExitIntent({
+        debug: true
+      });
 
       // Add an event listener for the exit intent
       window.addEventListener("exit-intent", (detail) => {

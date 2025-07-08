@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exit Intent - Simple Test</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .device-info {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+        .config-info {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+        .test-actions {
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+        .long-content {
+            height: 200vh;
+            background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        /* Simple Toast Styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        .toast {
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateX(100%);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: auto;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            .device-info {
+                background: #ffeaa7;
+                border-left-color: #fdcb6e;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Exit Intent Detection - Simple Test</h1>
+        <p>This page demonstrates exit intent detection with responsive scroll thresholds</p>
+    </div>
+
+    <div class="content">
+        <h2>Sample Content</h2>
+        <p>This is a test page to demonstrate exit intent detection with responsive scroll thresholds.</p>
+        
+        <p>The library now automatically detects whether you're on a mobile or desktop device and applies the appropriate scroll threshold:</p>
+        
+        <ul>
+            <li><strong>Mobile devices</strong> (screen width ≤ 768px): Lower threshold of 200px for easier triggering</li>
+            <li><strong>Desktop devices</strong> (screen width > 768px): Higher threshold of 400px</li>
+        </ul>
+        
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    </div>
+
+    <div class="long-content">
+        <h2>Long Content for Scrolling Test</h2>
+        <p>Scroll down to this section, then quickly scroll back up to test the responsive scroll-up exit intent trigger.</p>
+        
+        <p><strong>Instructions:</strong></p>
+        <ol>
+            <li>Scroll down to read this content</li>
+            <li>Quickly scroll back up toward the top</li>
+            <li>If you scroll up fast enough to meet the threshold, you'll see a toast notification</li>
+            <li>Try resizing your browser window to test different thresholds</li>
+        </ol>
+        
+        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+        
+        <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+        
+        <p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
+        
+        <p>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.</p>
+        
+        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.</p>
+        
+        <h3>End of Long Content</h3>
+        <p>You've reached the end! Now scroll back up quickly to test the exit intent detection.</p>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Include the exit-intent library -->
+    <script src="/src/exit-intent.js"></script>
+    
+    <script>
+        // Simple Toast Implementation
+        function showToast(message, duration = 5000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (container.contains(toast)) {
+                        container.removeChild(toast);
+                    }
+                }, 300);
+            }, duration);
+        }
+
+
+        // Set up exit intent detection with responsive scroll thresholds
+        const exitIntent = observeExitIntent({
+            debug: true, // Enable console logging
+        });
+
+        // Listen for exit intent events and show toast notifications
+        window.addEventListener('exit-intent', function(event) {
+            const reason = event.detail;
+            const timestamp = new Date().toLocaleTimeString();
+            
+            // Create a detailed message based on the trigger reason
+            let message = '';
+            
+            switch(reason) {
+                case 'timeOnPage':
+                    message = `🕐 Time on page trigger`;
+                    break;
+                case 'idleTime':
+                    message = `😴 Idle time trigger`;
+                    break;
+                case 'mouseLeave':
+                    message = `🖱️ Mouse leave trigger`;
+                    break;
+                case 'tabChange':
+                    message = `🔄 Tab change trigger`;
+                    break;
+                case 'windowBlur':
+                    message = `🔍 Window blur trigger`;
+                    break;
+                case 'scrollUp':
+                    const deviceType = window.innerWidth <= 768 ? 'mobile' : 'desktop';
+                    const threshold = window.innerWidth <= 768 ? 200 : 400;
+                    message = `📜 Scroll up trigger (${deviceType}: ${threshold}px)`;
+                    break;
+                case 'pageViews':
+                    message = `📊 Page views trigger`;
+                    break;
+                default:
+                    message = `🚪 Exit intent detected: ${reason}`;
+            }
+            
+            // Show the toast notification
+            showToast(`${message} at ${timestamp}`);
+            
+            // Also log to console for debugging
+            console.log('Exit intent triggered:', reason, 'at', timestamp);
+        });
+
+
+        // Show initial toast when page loads
+        window.addEventListener('load', function() {
+            showToast(`🎯 Exit intent active!`, 4000);
+        });
+    </script>
+</body>
+</html> 
